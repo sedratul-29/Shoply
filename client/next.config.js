@@ -1,15 +1,10 @@
-/** @type {import('next').NextConfig} */
-const API_URL = process.env.API_URL || 'http://localhost:5000';
 
+
+
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  // Proxy /api/* to the Express server. The browser only ever talks to the
-  // Next.js origin, so the httpOnly auth cookie is same-origin (no CORS or
-  // third-party-cookie headaches) and the API URL stays private.
-  async rewrites() {
-    return [{ source: '/api/:path*', destination: `${API_URL}/api/:path*` }];
-  },
   async headers() {
     return [
       {
