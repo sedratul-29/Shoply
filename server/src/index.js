@@ -66,6 +66,22 @@ app.use('/api/auth/register', authLimiter);
 
 app.use('/api', csrfGuard);
 
+// Connect to MongoDB once and reuse the connection. Needed for serverless hosts
+// (e.g. Vercel) where the app is exported and never calls start(); harmless elsewhere.
+let dbPromise = null;
+function ensureDB() {
+  if (!dbPromise) {
+    dbPromise = connectDB().catch((err) => {
+      dbPromise = null; // allow a retry on the next request
+      throw err;
+    });
+  }
+  return dbPromise;
+}
+app.use('/api', (_req, _res, next) => {
+  ensureDB().then(() => next(), next);
+});
+
 /* --------------------------------- Routes --------------------------------- */
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth', require('./routes/auth'));
@@ -78,7 +94,7 @@ app.use(errorHandler);
 
 /* --------------------------------- Startup -------------------------------- */
 async function start() {
-  await connectDB();
+  await ensureDB();
   const port = process.env.PORT || 5000;
   app.listen(port, () => console.log(`API running on http://localhost:${port}`));
 }

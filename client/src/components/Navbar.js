@@ -40,6 +40,12 @@ export default function Navbar() {
             </Link>
           )}
 
+          {user && (
+            <Link href="/profile" className="rounded-lg px-3 py-2 hover:bg-slate-100">
+              Profile
+            </Link>
+          )}
+
           <Link href="/cart" className="relative rounded-lg px-3 py-2 hover:bg-slate-100">
             Cart
             {count > 0 && (
